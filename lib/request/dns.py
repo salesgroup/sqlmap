@@ -17,14 +17,9 @@ import time
 
 class DNSQuery(object):
     """
-    Used for making fake DNS resolution responses based on received
-    raw request
-
-    Reference(s):
-        http://code.activestate.com/recipes/491264-mini-fake-dns-server/
-        https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
-
     >>> DNSQuery(b'|K\\x01 \\x00\\x01\\x00\\x00\\x00\\x00\\x00\\x01\\x03www\\x06google\\x03com\\x00\\x00\\x01\\x00\\x01\\x00\\x00)\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x0c\\x00\\n\\x00\\x08O4|Np!\\x1d\\xb3')._query == b"www.google.com."
+    True
+    >>> DNSQuery(b'\\x00')._query == b""
     True
     """
 
@@ -32,16 +27,19 @@ class DNSQuery(object):
         self._raw = raw
         self._query = b""
 
-        type_ = (ord(raw[2:3]) >> 3) & 15                 # Opcode bits
+        try:
+            type_ = (ord(raw[2:3]) >> 3) & 15                   # Opcode bits
 
-        if type_ == 0:                                  # Standard query
-            i = 12
-            j = ord(raw[i:i + 1])
-
-            while j != 0:
-                self._query += raw[i + 1:i + j + 1] + b'.'
-                i = i + j + 1
+            if type_ == 0:                                      # Standard query
+                i = 12
                 j = ord(raw[i:i + 1])
+
+                while j != 0:
+                    self._query += raw[i + 1:i + j + 1] + b'.'
+                    i = i + j + 1
+                    j = ord(raw[i:i + 1])
+        except TypeError:
+            pass
 
     def response(self, resolution):
         """
@@ -65,6 +63,15 @@ class DNSQuery(object):
         return retVal
 
 class DNSServer(object):
+    """
+    Used for making fake DNS resolution responses based on received
+    raw request
+
+    Reference(s):
+        http://code.activestate.com/recipes/491264-mini-fake-dns-server/
+        https://code.google.com/p/marlon-tools/source/browse/tools/dnsproxy/dnsproxy.py
+    """
+
     def __init__(self):
         self._check_localhost()
         self._requests = []
@@ -99,9 +106,15 @@ class DNSServer(object):
 
         retVal = None
 
+        if prefix and hasattr(prefix, "encode"):
+            prefix = prefix.encode()
+
+        if suffix and hasattr(suffix, "encode"):
+            suffix = suffix.encode()
+
         with self._lock:
             for _ in self._requests:
-                if prefix is None and suffix is None or re.search(r"%s\..+\.%s" % (prefix, suffix), _, re.I):
+                if prefix is None and suffix is None or re.search(b"%s\..+\.%s" % (prefix, suffix), _, re.I):
                     retVal = _
                     self._requests.remove(_)
                     break
