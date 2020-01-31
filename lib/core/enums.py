@@ -51,6 +51,7 @@ class DBMS(object):
     MCKOI = "Mckoi"
     PRESTO = "Presto"
     ALTIBASE = "Altibase"
+    MIMERSQL = "MimerSQL"
 
 class DBMS_DIRECTORY_NAME(object):
     ACCESS = "access"
@@ -72,6 +73,7 @@ class DBMS_DIRECTORY_NAME(object):
     MCKOI = "mckoi"
     PRESTO = "presto"
     ALTIBASE = "altibase"
+    MIMERSQL = "mimersql"
 
 class FORK(object):
     MARIADB = "MariaDB"
@@ -79,6 +81,8 @@ class FORK(object):
     PERCONA = "Percona"
     COCKROACHDB = "CockroachDB"
     TIDB = "TiDB"
+    REDSHIFT = "Amazon Redshift"
+    GREENPLUM = "Greenplum"
 
 class CUSTOM_LOGGING(object):
     PAYLOAD = 9

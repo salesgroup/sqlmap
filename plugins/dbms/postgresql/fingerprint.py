@@ -29,7 +29,15 @@ class Fingerprint(GenericFingerprint):
         fork = hashDBRetrieve(HASHDB_KEYS.DBMS_FORK)
 
         if fork is None:
-            fork = inject.checkBooleanExpression("VERSION() LIKE '%CockroachDB%'") and FORK.COCKROACHDB or ""
+            if inject.checkBooleanExpression("VERSION() LIKE '%CockroachDB%'"):
+                fork = FORK.COCKROACHDB
+            elif inject.checkBooleanExpression("VERSION() LIKE '%Redshift%'"):  # Reference: https://dataedo.com/kb/query/amazon-redshift/check-server-version
+                fork = FORK.REDSHIFT
+            elif inject.checkBooleanExpression("VERSION() LIKE '%Greenplum%'"):  # Reference: http://www.sqldbpros.com/wordpress/wp-content/uploads/2014/08/what-version-of-greenplum.png
+                fork = FORK.GREENPLUM
+            else:
+                fork = ""
+
             hashDBWrite(HASHDB_KEYS.DBMS_FORK, fork)
 
         value = ""
