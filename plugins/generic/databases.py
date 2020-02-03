@@ -87,7 +87,7 @@ class Databases(object):
             warnMsg += "schema names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
             singleTimeWarnMessage(warnMsg)
-        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
             warnMsg = "on %s you'll need to use " % Backend.getIdentifiedDbms()
             warnMsg += "user names for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
@@ -115,7 +115,7 @@ class Databases(object):
 
             infoMsg = "fetching database (schema) names"
 
-        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE,):
+        elif Backend.getIdentifiedDbms() in (DBMS.ALTIBASE, DBMS.CUBRID):
             warnMsg = "user names are going to be used on %s " % Backend.getIdentifiedDbms()
             warnMsg += "for enumeration as the counterpart to database "
             warnMsg += "names on other DBMSes"
@@ -602,7 +602,7 @@ class Databases(object):
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CUBRID):
                     query = rootQuery.inband.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
@@ -744,7 +744,7 @@ class Databases(object):
                     condQueryStr = "%%s%s" % colCondParam
                     condQuery = " AND (%s)" % " OR ".join(condQueryStr % (condition, unsafeSQLIdentificatorNaming(col)) for col in sorted(colList))
 
-                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
+                if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CUBRID):
                     query = rootQuery.blind.count % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                     query += condQuery
 
@@ -811,7 +811,7 @@ class Databases(object):
                             continue
 
                 for index in getLimitRange(count):
-                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB):
+                    if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.HSQLDB, DBMS.VERTICA, DBMS.PRESTO, DBMS.CRATEDB, DBMS.CUBRID):
                         query = rootQuery.blind.query % (unsafeSQLIdentificatorNaming(tbl), unsafeSQLIdentificatorNaming(conf.db))
                         query += condQuery
                         field = None

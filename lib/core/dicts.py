@@ -13,6 +13,7 @@ from lib.core.settings import ACCESS_ALIASES
 from lib.core.settings import ALTIBASE_ALIASES
 from lib.core.settings import BLANK
 from lib.core.settings import CRATEDB_ALIASES
+from lib.core.settings import CUBRID_ALIASES
 from lib.core.settings import DB2_ALIASES
 from lib.core.settings import DERBY_ALIASES
 from lib.core.settings import FIREBIRD_ALIASES
@@ -214,6 +215,7 @@ DBMS_DICT = {
     DBMS.ALTIBASE: (ALTIBASE_ALIASES, None, None, None),
     DBMS.MIMERSQL: (MIMERSQL_ALIASES, "mimerpy", "https://github.com/mimersql/MimerPy", None),
     DBMS.CRATEDB: (CRATEDB_ALIASES, "python-psycopg2", "http://initd.org/psycopg/", "postgresql"),
+    DBMS.CUBRID: (CUBRID_ALIASES, "CUBRID-Python", "https://github.com/CUBRID/cubrid-python", None),
 }
 
 # Reference: https://blog.jooq.org/tag/sysibm-sysdummy1/
@@ -237,6 +239,7 @@ HEURISTIC_NULL_EVAL = {
     DBMS.ORACLE: "INSTR2(NULL,NULL)",
     DBMS.PGSQL: "QUOTE_IDENT(NULL)",
     DBMS.SQLITE: "UNLIKELY(NULL)",
+    DBMS.H2: "STRINGTOUTF8(NULL)",
     DBMS.MONETDB: "CODE(NULL)",
     DBMS.DERBY: "NULLIF(USER,SESSION_USER)",
     DBMS.VERTICA: "BITSTRING_TO_BINARY(NULL)",
@@ -244,7 +247,8 @@ HEURISTIC_NULL_EVAL = {
     DBMS.PRESTO: "FROM_HEX(NULL)",
     DBMS.ALTIBASE: "TDESENCRYPT(NULL,NULL)",
     DBMS.MIMERSQL: "ASCII_CHAR(256)",
-    DBMS.CRATEDB: "(NULL~NULL)",
+    DBMS.CRATEDB: "MD5(NULL~NULL)",  # Note: NULL~NULL also being evaluated on H2 and Ignite
+    DBMS.CUBRID: "(NULL SETEQ NULL)",
 }
 
 SQL_STATEMENTS = {

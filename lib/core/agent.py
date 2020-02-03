@@ -300,8 +300,9 @@ class Agent(object):
             where = getTechniqueData().where if where is None else where
             comment = getTechniqueData().comment if comment is None else comment
 
-        if Backend.getIdentifiedDbms() in (DBMS.ACCESS, DBMS.MCKOI) and any((comment or "").startswith(_) for _ in ("--", GENERIC_SQL_COMMENT_MARKER)):
-            comment = queries[Backend.getIdentifiedDbms()].comment.query
+        if any((comment or "").startswith(_) for _ in ("--", GENERIC_SQL_COMMENT_MARKER)):
+            if Backend.getIdentifiedDbms() and not GENERIC_SQL_COMMENT.startswith(queries[Backend.getIdentifiedDbms()].comment.query):
+                comment = queries[Backend.getIdentifiedDbms()].comment.query
 
         if comment is not None:
             expression += comment
@@ -387,7 +388,7 @@ class Agent(object):
             for _ in set(re.findall(r"\[RANDSTR(?:\d+)?\]", payload, re.I)):
                 payload = payload.replace(_, randomStr())
 
-            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) in (FORK.MEMSQL, FORK.TIDB):
+            if hashDBRetrieve(HASHDB_KEYS.DBMS_FORK) in (FORK.MEMSQL, FORK.TIDB, FORK.DRIZZLE):
                 payload = re.sub(r"(?i)\bORD\(", "ASCII(", payload)
                 payload = re.sub(r"(?i)\bMID\(", "SUBSTR(", payload)
                 payload = re.sub(r"(?i)\bNCHAR\b", "CHAR", payload)
@@ -659,7 +660,7 @@ class Agent(object):
             elif fieldsNoSelect:
                 concatenatedQuery = "CONCAT('%s',%s,'%s')" % (kb.chars.start, concatenatedQuery, kb.chars.stop)
 
-        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB):
+        elif Backend.getIdentifiedDbms() in (DBMS.PGSQL, DBMS.ORACLE, DBMS.SQLITE, DBMS.DB2, DBMS.FIREBIRD, DBMS.HSQLDB, DBMS.H2, DBMS.MONETDB, DBMS.DERBY, DBMS.VERTICA, DBMS.MCKOI, DBMS.PRESTO, DBMS.ALTIBASE, DBMS.MIMERSQL, DBMS.CRATEDB, DBMS.CUBRID):
             if fieldsExists:
                 concatenatedQuery = concatenatedQuery.replace("SELECT ", "'%s'||" % kb.chars.start, 1)
                 concatenatedQuery += "||'%s'" % kb.chars.stop
@@ -948,7 +949,7 @@ class Agent(object):
         fromFrom = limitedQuery[fromIndex + 1:]
         orderBy = None
 
-        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL):
+        if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL, DBMS.SQLITE, DBMS.H2, DBMS.VERTICA, DBMS.PRESTO, DBMS.MIMERSQL, DBMS.CUBRID):
             limitStr = queries[Backend.getIdentifiedDbms()].limit.query % (num, 1)
             limitedQuery += " %s" % limitStr
 
