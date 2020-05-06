@@ -48,6 +48,7 @@ def vulnTest():
         ("-r <request> --flush-session -v 5 --test-skip='heavy' --save=<tmp>", ("CloudFlare", "possible DBMS: 'SQLite'", "User-agent: foobar", "~Type: time-based blind")),
         ("-l <log> --flush-session --keep-alive --skip-waf -v 5 --technique=U --union-from=users --banner --parse-errors", ("banner: '3.", "ORDER BY term out of range", "~xp_cmdshell", "Connection: keep-alive")),
         ("-l <log> --offline --banner -v 5", ("banner: '3.", "~[TRAFFIC OUT]")),
+        ("-u <url> --flush-session --banner --technique=B --not-string 'no results'", ("banner: '3.",)),
         ("-u <url> --flush-session --banner --technique=B --first=1 --last=2", ("banner: '3.'",)),
         ("-u <url> --flush-session --encoding=ascii --forms --crawl=2 --threads=2 --banner", ("total of 2 targets", "might be injectable", "Type: UNION query", "banner: '3.")),
         ("-u <url> --flush-session --data='{\"id\": 1}' --banner", ("might be injectable", "3 columns", "Payload: {\"id\"", "Type: boolean-based blind", "Type: time-based blind", "Type: UNION query", "banner: '3.")),
@@ -326,7 +327,7 @@ def smokeTest():
     count, length = 0, 0
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if any(_ in root for _ in ("thirdparty", "extra")):
+        if any(_ in root for _ in ("thirdparty", "extra", "interbase")):
             continue
 
         for filename in files:
@@ -334,7 +335,7 @@ def smokeTest():
                 length += 1
 
     for root, _, files in os.walk(paths.SQLMAP_ROOT_PATH):
-        if any(_ in root for _ in ("thirdparty", "extra")):
+        if any(_ in root for _ in ("thirdparty", "extra", "interbase")):
             continue
 
         for filename in files:
